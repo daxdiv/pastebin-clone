@@ -10,7 +10,8 @@ const Paste: NextPage = () => {
         error,
     } = trpc.useQuery(["paste.get-by-id", { id: router.query.id as string }]);
 
-    if (isLoading) return <div>Loading...</div>;
+    if (isLoading)
+        return <div className="font-bold text-white bg-gray-800">Loading...</div>;
     if (error) return <div>Error: {error.message}</div>;
 
     return (
