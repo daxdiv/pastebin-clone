@@ -32,4 +32,15 @@ export const pasteRouter = createRouter()
 
             return pastes;
         },
+    })
+    .query("get-by-id", {
+        input: z.object({ id: z.string() }),
+        async resolve({ input, ctx }) {
+            const { id } = input;
+            const paste = await ctx.prisma.paste.findUnique({
+                where: { id },
+            });
+
+            return paste;
+        },
     });
