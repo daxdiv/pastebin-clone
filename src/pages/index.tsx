@@ -1,8 +1,22 @@
 import type { NextPage } from "next";
-import { useState } from "react";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
     const [pasteText, setPasteText] = useState<string>("");
+    const { data: pastes, isLoading, refetch } = trpc.useQuery(["paste.get-all"]);
+    const createPasteMutation = trpc.useMutation("paste.create");
+
+    const handleSubmit = (e: React.MouseEvent) => {
+        e.preventDefault();
+
+        if (pasteText === "") return;
+
+        createPasteMutation.mutate({ text: pasteText }, { onSuccess: () => refetch() });
+    };
+
+    if (isLoading) return <div>Loading...</div>;
 
     return (
         <div className="flex flex-col justify-center items-center w-full h-screen bg-gray-800 text-white">
@@ -14,9 +28,13 @@ const Home: NextPage = () => {
                 onChange={e => setPasteText(e.target.value)}
                 className="p-2 bg-gray-700 border-2 border-white rounded-md"
             ></textarea>
-            <button className="font-bold px-2 py-1 cursor-pointer mt-4 bg-cyan-700 border-2 border-white rounded-xl w-24 hover:scale-105 hover:bg-cyan-500 d transition-all">
+            <button
+                className="font-bold px-2 py-1 cursor-pointer mt-4 bg-cyan-700 border-2 border-white rounded-xl w-24 hover:scale-105 hover:bg-cyan-500 d transition-all"
+                onClick={e => handleSubmit(e)}
+            >
                 Submit
             </button>
+            <p className="mt-4">{JSON.stringify(pastes)}</p>
         </div>
     );
 };
