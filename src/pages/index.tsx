@@ -5,7 +5,7 @@ import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
     const [pasteText, setPasteText] = useState<string>("");
-    const { data: pastes, isLoading, refetch } = trpc.useQuery(["paste.get-all"]);
+    const router = useRouter();
     const createPasteMutation = trpc.useMutation("paste.create");
 
     const handleSubmit = (e: React.MouseEvent) => {
@@ -13,10 +13,15 @@ const Home: NextPage = () => {
 
         if (pasteText === "") return;
 
-        createPasteMutation.mutate({ text: pasteText }, { onSuccess: () => refetch() });
+        createPasteMutation.mutate(
+            { text: pasteText },
+            {
+                onSuccess: ({ id }) => {
+                    router.push(`/pastes/${id}`);
+                },
+            }
+        );
     };
-
-    if (isLoading) return <div>Loading...</div>;
 
     return (
         <div className="flex flex-col justify-center items-center w-full h-screen bg-gray-800 text-white">
@@ -34,7 +39,6 @@ const Home: NextPage = () => {
             >
                 Submit
             </button>
-            <p className="mt-4">{JSON.stringify(pastes)}</p>
         </div>
     );
 };
