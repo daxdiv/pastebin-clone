@@ -35,6 +35,7 @@ const Home: NextPage = () => {
             ></textarea>
             <button
                 className="font-bold px-2 py-1 cursor-pointer mt-4 bg-cyan-700 border-2 border-white rounded-xl w-24 hover:scale-105 hover:bg-cyan-500 d transition-all"
+                disabled={createPasteMutation.isLoading}
                 onClick={e => handleSubmit(e)}
             >
                 Submit
