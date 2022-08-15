@@ -4,10 +4,14 @@ import { trpc } from "../../utils/trpc";
 import { VscCopy } from "react-icons/vsc";
 import { BiLink } from "react-icons/bi";
 import { env } from "../../env/client.mjs";
+import CopyToClipboardIconWrapper from "../CopyToClipboardIconWrapper";
+import useCopyState from "../../hooks/useCopyState";
+// import CopyToClipboardIconWrapper from "../CopyToClipBoardIconWrapper";
 
 const Paste: NextPage = ({
     host,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+    const { copied, toggleCopyState } = useCopyState();
     const router = useRouter();
     const {
         data: paste,
@@ -15,15 +19,16 @@ const Paste: NextPage = ({
         error,
     } = trpc.useQuery(["paste.get-by-id", { id: router.query.id as string }]);
 
-    const handleCopyToClipBoard = (text: string) => {
+    const handleCopyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
 
-        console.log("Copied to clipboard", text);
+        console.log("Copied to Clipboard", text);
     };
 
+    if (error) return <div>Error: {error.message}</div>;
     if (isLoading)
         return <div className="font-bold text-white bg-gray-800">Loading...</div>;
-    if (error) return <div>Error: {error.message}</div>;
+    if (!paste) return <div>Paste not found</div>;
 
     return (
         <div className="flex flex-col justify-center items-center w-full h-screen bg-gray-800 text-white">
@@ -35,17 +40,31 @@ const Paste: NextPage = ({
                 className="p-2 bg-gray-700 border-2 border-white rounded-md"
                 disabled
             ></textarea>
-            <div className="flex gap-2 mt-4 text-white justify-center items-center">
-                <VscCopy
-                    className="cursor-pointer text-2xl rounded-md hover:scale-110 transition-all"
-                    onClick={() =>
-                        handleCopyToClipBoard(
-                            `${host}/pastes/${router.query.id as string}`
-                        )
-                    }
+            <div className="flex gap-8 mt-4 text-white justify-center items-center">
+                <CopyToClipboardIconWrapper
+                    action={() => {
+                        handleCopyToClipboard(paste?.text!);
+                        toggleCopyState();
+
+                        console.log("Copied to Clipboard", paste?.text!);
+                    }}
+                    Icon={VscCopy}
+                    text="Copy text"
                 />
-                <BiLink className="cursor-pointer text-2xl rounded-md hover:scale-110 transition-all" />
+                <CopyToClipboardIconWrapper
+                    action={() => {
+                        handleCopyToClipboard(`${host}/pastes/${router.query.id}`);
+                        toggleCopyState();
+                    }}
+                    Icon={BiLink}
+                    text="Copy link"
+                />
             </div>
+            {copied && (
+                <code className="fixed bottom-8 flex justify-center font-bold text-sm">
+                    Copied to Clipboard
+                </code>
+            )}
         </div>
     );
 };
