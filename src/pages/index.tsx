@@ -10,9 +10,6 @@ const Home: NextPage = () => {
     const createPasteMutation = trpc.useMutation("paste.create");
     const selectExpireTimeRef = useRef<HTMLSelectElement>(null);
 
-    const customArrowStyles =
-        "after:content-[''] after:w-0 after:h-0 after:border-l-4 after:border-r-4 after:border-t-4 after:border-l-transparent after:border-r-transparent after:border-t-white after:z-10 relative after:absolute after:top-2 after:right-[-75%]";
-
     const handleSubmit = (e: React.MouseEvent) => {
         e.preventDefault();
 
@@ -43,7 +40,9 @@ const Home: NextPage = () => {
             ></textarea>
 
             <div className="flex justify-center items-center mt-4 gap-2">
-                <p className={`font-bold text-sm ${customArrowStyles}`}>
+                <p className="font-bold text-sm custom-select-arrow">
+                    {" "}
+                    {/* class defined in globals.css */}
                     Paste expires in:{" "}
                 </p>
                 <select

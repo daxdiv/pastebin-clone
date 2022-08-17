@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+    .custom-select-arrow {
+        @apply after:content-[''] after:w-0 after:h-0 after:border-l-4 after:border-r-4 after:border-t-4 after:border-l-transparent after:border-r-transparent after:border-t-white after:z-10 relative after:absolute after:top-2 after:right-[-75%];
+    }
+}
