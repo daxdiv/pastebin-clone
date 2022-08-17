@@ -5,13 +5,13 @@ import { VscCopy } from "react-icons/vsc";
 import { BiLink } from "react-icons/bi";
 import { env } from "../../env/client.mjs";
 import CopyToClipboardIconWrapper from "../components/CopyToClipboardIconWrapper";
-import useCopyState from "../../hooks/useCopyState";
+import useToggleState from "../../hooks/useToggleState";
 import ErrorPage from "../error";
 
 const Paste: NextPage = ({
     host,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-    const { copied, toggleCopyState } = useCopyState();
+    const { copied, toggleState: toggleCopyState } = useToggleState(2000);
     const router = useRouter();
     const {
         data: paste,
