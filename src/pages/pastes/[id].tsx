@@ -4,9 +4,9 @@ import { trpc } from "../../utils/trpc";
 import { VscCopy } from "react-icons/vsc";
 import { BiLink } from "react-icons/bi";
 import { env } from "../../env/client.mjs";
-import CopyToClipboardIconWrapper from "../CopyToClipboardIconWrapper";
+import CopyToClipboardIconWrapper from "../components/CopyToClipboardIconWrapper";
 import useCopyState from "../../hooks/useCopyState";
-// import CopyToClipboardIconWrapper from "../CopyToClipBoardIconWrapper";
+import ErrorPage from "../error";
 
 const Paste: NextPage = ({
     host,
@@ -21,14 +21,12 @@ const Paste: NextPage = ({
 
     const handleCopyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
-
-        console.log("Copied to Clipboard", text);
     };
 
     if (error) return <div>Error: {error.message}</div>;
     if (isLoading)
         return <div className="font-bold text-white bg-gray-800">Loading...</div>;
-    if (!paste) return <div>Paste not found</div>;
+    if (!paste) return <ErrorPage />;
 
     return (
         <div className="flex flex-col justify-center items-center w-full h-screen bg-gray-800 text-white">
@@ -43,17 +41,19 @@ const Paste: NextPage = ({
             <div className="flex gap-8 mt-4 text-white justify-center items-center">
                 <CopyToClipboardIconWrapper
                     action={() => {
-                        handleCopyToClipboard(paste?.text!);
-                        toggleCopyState();
+                        const text = paste?.text!;
 
-                        console.log("Copied to Clipboard", paste?.text!);
+                        handleCopyToClipboard(text);
+                        toggleCopyState();
                     }}
                     Icon={VscCopy}
                     text="Copy text"
                 />
                 <CopyToClipboardIconWrapper
                     action={() => {
-                        handleCopyToClipboard(`${host}/pastes/${router.query.id}`);
+                        const url = `${host}/pastes/${router.query.id}`;
+
+                        handleCopyToClipboard(url);
                         toggleCopyState();
                     }}
                     Icon={BiLink}
