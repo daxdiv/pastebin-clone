@@ -7,6 +7,7 @@ import { env } from "../../env/client.mjs";
 import CopyToClipboardIconWrapper from "../components/CopyToClipboardIconWrapper";
 import useToggleState from "../../hooks/useToggleState";
 import ErrorPage from "../error";
+import { useEffect } from "react";
 
 const Paste: NextPage = ({
     host,
@@ -17,11 +18,23 @@ const Paste: NextPage = ({
         data: paste,
         isLoading,
         error,
-    } = trpc.useQuery(["paste.get-by-id", { id: router.query.id as string }]);
+    } = trpc.useQuery(["paste.get-by-id", { id: router.query.id as string }], {
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+    });
 
     const handleCopyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
     };
+
+    useEffect(() => {
+        if (paste?.locked) {
+            router.push({
+                pathname: "/pastes/validate",
+                query: { id: router.query.id },
+            });
+        }
+    });
 
     if (error) return <div>Error: {error.message}</div>;
     if (isLoading)
