@@ -16,14 +16,18 @@ export const pasteRouter = createRouter()
         input: z.object({
             text: z.string(),
             expiresIn: z.enum(["1h", "1d", "1w", "1m", "1y"]).default("1d"),
+            password: z.string().optional(),
+            locked: z.boolean().default(false),
         }),
         async resolve({ input, ctx }) {
             try {
-                const { text, expiresIn } = input;
+                const { text, expiresIn, password, locked } = input;
                 const paste = await ctx.prisma.paste.create({
                     data: {
                         text,
                         createdAt: new Date(),
+                        password,
+                        locked,
                     },
                 });
 
@@ -64,5 +68,34 @@ export const pasteRouter = createRouter()
             });
 
             return paste;
+        },
+    })
+    .mutation("unlock", {
+        input: z.object({ id: z.string(), password: z.string() }),
+        async resolve({ input, ctx }) {
+            const { id, password } = input;
+            const paste = await ctx.prisma.paste.findUnique({
+                where: { id },
+                select: { password: true },
+            });
+
+            if (!paste) {
+                throw new TRPCError({
+                    message: "Paste not found",
+                    code: "NOT_FOUND",
+                });
+            }
+
+            if (paste.password !== password) {
+                throw new TRPCError({
+                    message: "Invalid password",
+                    code: "UNAUTHORIZED",
+                });
+            }
+
+            await ctx.prisma.paste.update({
+                where: { id },
+                data: { locked: false },
+            });
         },
     });
