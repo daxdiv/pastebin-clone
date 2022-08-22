@@ -15,4 +15,5 @@ model Paste {
     text      String   @db.Text
     createdAt DateTime @default(now())
     password  String?
+    locked    Boolean  @default(false)
 }
