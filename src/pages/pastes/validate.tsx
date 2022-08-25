@@ -4,18 +4,16 @@ import { useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { env } from "../../env/client.mjs";
 import useToggleState from "../../hooks/useToggleState";
+import handleCopyToClipboard from "../../utils/copyToClipboard";
 
 const Validate = ({ host }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-    const { copied, toggleState: toggleCopyState } = useToggleState(2000);
+    const { state: copyState, toggleState: toggleCopyState } = useToggleState(2000);
     const unlockMutation = trpc.useMutation("paste.unlock");
     const [password, setPassword] = useState<string>("");
     const [error, setError] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(unlockMutation.isLoading);
     const router = useRouter();
 
-    const handleCopyToClipboard = (text: string) => {
-        navigator.clipboard.writeText(text);
-    };
     const handleSubmit = async (e: React.MouseEvent) => {
         e.preventDefault();
 
@@ -30,7 +28,6 @@ const Validate = ({ host }: InferGetServerSidePropsType<typeof getServerSideProp
             {
                 onSuccess: () => router.push(`/pastes/${router.query.id}`),
                 onError: ({ message }) => setError(message),
-                onSettled: () => setIsLoading(false),
             }
         );
     };
@@ -46,7 +43,9 @@ const Validate = ({ host }: InferGetServerSidePropsType<typeof getServerSideProp
                 value={password}
                 onChange={e => setPassword(e.target.value)}
             />
+
             {error && <p className="my-2 text-red-500 font-bold">{error}</p>}
+
             <div className="flex justify-center items-center gap-2 mt-4">
                 <button
                     className="font-bold px-2 py-1 cursor-pointer bg-cyan-700 border-2 border-white rounded-xl hover:scale-105 hover:bg-cyan-500 transition-all"
@@ -67,7 +66,8 @@ const Validate = ({ host }: InferGetServerSidePropsType<typeof getServerSideProp
                     Copy link
                 </button>
             </div>
-            {copied && (
+
+            {copyState && (
                 <code className="fixed bottom-8 flex justify-center font-bold text-sm">
                     Copied to Clipboard
                 </code>
