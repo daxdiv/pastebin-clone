@@ -1,17 +1,17 @@
 import { useState } from "react";
 
 const useToggleState = (delay: number = 2000) => {
-    const [copied, setCopied] = useState<boolean>(false);
+    const [state, setState] = useState<boolean>(false);
 
     const toggleState = () => {
-        setCopied(true);
+        setState(true);
         setTimeout(() => {
-            setCopied(false);
+            setState(false);
         }, delay);
     };
 
     return {
-        copied,
+        state,
         toggleState,
     };
 };
