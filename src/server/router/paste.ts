@@ -29,6 +29,11 @@ export const pasteRouter = createRouter()
                         password,
                         locked,
                     },
+                    select: {
+                        id: true,
+                        text: true,
+                        locked: true,
+                    },
                 });
 
                 setTimeout(async () => {
@@ -54,7 +59,9 @@ export const pasteRouter = createRouter()
     })
     .query("get-all", {
         async resolve({ ctx }) {
-            const pastes = await ctx.prisma.paste.findMany();
+            const pastes = await ctx.prisma.paste.findMany({
+                select: { id: true, text: true, locked: true },
+            });
 
             return pastes;
         },
@@ -65,6 +72,11 @@ export const pasteRouter = createRouter()
             const { id } = input;
             const paste = await ctx.prisma.paste.findUnique({
                 where: { id },
+                select: {
+                    id: true,
+                    text: true,
+                    locked: true,
+                },
             });
 
             return paste;
