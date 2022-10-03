@@ -1,4 +1,4 @@
-import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import type { GetServerSideProps, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { trpc } from "../../utils/trpc";
@@ -6,12 +6,13 @@ import { env } from "../../env/client.mjs";
 import useToggleState from "../../hooks/useToggleState";
 import handleCopyToClipboard from "../../utils/copyToClipboard";
 
-const Validate = ({ host }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+type ValidateProps = { host: string };
+
+const Validate: NextPage<ValidateProps> = ({ host }) => {
     const { state: copyState, toggleState: toggleCopyState } = useToggleState(2000);
     const unlockMutation = trpc.useMutation("paste.unlock");
     const [password, setPassword] = useState<string>("");
     const [error, setError] = useState<string>("");
-    const [isLoading, setIsLoading] = useState<boolean>(unlockMutation.isLoading);
     const router = useRouter();
 
     const handleSubmit = async (e: React.MouseEvent) => {
@@ -49,7 +50,7 @@ const Validate = ({ host }: InferGetServerSidePropsType<typeof getServerSideProp
             <div className="flex justify-center items-center gap-2 mt-4">
                 <button
                     className="font-bold px-2 py-1 cursor-pointer bg-cyan-700 border-2 border-white rounded-xl hover:scale-105 hover:bg-cyan-500 transition-all"
-                    disabled={isLoading}
+                    disabled={unlockMutation.isLoading}
                     onClick={handleSubmit}
                 >
                     Validate
